@@ -32,7 +32,7 @@ def get_market_data(symbol):
                 "symbol": symbol,
                 "price": current,
                 "change": round(change, 2)
-            }
+            }#返回当前价格和涨跌幅
 
             # 写入缓存
             _cache[symbol] = result

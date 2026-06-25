@@ -20,5 +20,9 @@ def analyze_analyze():
             "sector": sector,
             "avg_change": round(avg_change, 2)
         })
-
+        # 对结果按照平均涨跌幅进行排序，降序排列
+        results.sort(
+        key=lambda x:x["avg_change"],
+        reverse=True
+)
     return results

@@ -16,5 +16,12 @@ SECTORS = {
         "QQQ",
         "AAPL",
         "MSFT"
-    ]
+    ],
+
+    "CPO":[
+        "ANET",
+        "CIEN",
+        "LITE"
+    ]   
+
 }
