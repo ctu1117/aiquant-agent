@@ -1,7 +1,10 @@
 import time
 import finnhub
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-client = finnhub.Client(api_key="d8s2nfpr01qlj6fflm0gd8s2nfpr01qlj6fflm10")
+client=finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
 
 # 本地缓存
 _cache = {}

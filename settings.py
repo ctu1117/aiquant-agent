@@ -13,3 +13,5 @@ DEEPSEEK_BASE_URL = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.co
 # LLM 配置
 LLM_TEMPERATURE = float(os.environ.get("LLM_TEMPERATURE", "0.3"))
 LLM_MODEL = os.environ.get("LLM_MODEL", "deepseek-chat")
+
+POLYGON_API_KEY = os.environ.get("POLYGON_API_KEY")

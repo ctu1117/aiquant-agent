@@ -1,28 +1,16 @@
-def generate_signal(
-    prev_ma20,
-    prev_ma60,
-    curr_ma20,
-    curr_ma60,
-    rsi
-):
+import pandas as pd
 
-    # 金叉 + RSI不过热
-    if (
-        prev_ma20 <= prev_ma60
-        and curr_ma20 > curr_ma60
-    ):
-
-        return "BUY"
-
-    # 死叉
-    elif (
-        prev_ma20 >= prev_ma60
-        and curr_ma20 < curr_ma60
-    ):
-        return "SELL"
-
-    # RSI极度过热
-    elif rsi > 95:
-        return "SELL"
-
-    return "HOLD"
+def generate_signals(df:pd.DataFrame):
+    entries=(
+        (df["MA20"]>df["MA60"])
+        &
+        (df["MA20"].shift(1)<=df["MA60"].shift(1))
+        &
+        (df["RSI"]<70)
+    )
+    exits=(    
+        (df["MA20"] < df["MA60"])
+        &
+        (df["MA20"].shift(1) >= df["MA60"].shift(1))
+    )
+    return entries.fillna(False), exits.fillna(False)

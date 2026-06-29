@@ -1,4 +1,4 @@
-from data_agent import load_data
+from data.data_agent import load_data
 from backtest.engine import run_backtest
 from agent.report_agent import generate_report
 from strategy.ma_strategy import generate_signal
@@ -11,7 +11,15 @@ from agent.news_summary_agent import summarize_news
 from agent.news_agent import get_news
 
 df = load_data()
-final_cash, trades, trade_log = run_backtest(df)
+result = run_backtest(df)
+
+print("最终资金：", result["final_cash"])
+print("收益率：", result["return_pct"], "%")
+print("交易次数：", result["trade_count"])
+
+print("\n===== 交易记录 =====")
+for item in result["trade_log"]:
+    print(item)
 prev_ma20 = df["MA20"].iloc[-2]
 prev_ma60 = df["MA60"].iloc[-2]
 
@@ -28,8 +36,6 @@ risk = USER_PROFILE["risk"]
 
 news = get_news("NVDA", days=7, limit=15)
 
-print("最终资金:", round(final_cash, 2))
-print("交易次数:", trades)
 print(report)
 print(df[["Close","RSI"]].tail())
 print("\n===== 实时行情 =====")
