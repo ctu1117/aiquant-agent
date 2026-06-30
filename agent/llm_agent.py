@@ -45,7 +45,7 @@ def generate_llm_report(
         messages=[
             {
                 "role":"system",
-                "content":"你是一名专业QDII基金投资顾问，擅长分析全球市场和行业趋势，给出精准投资建议"
+                "content":"你是一名专业基金投资顾问，擅长分析全球市场和行业趋势，给出精准投资建议"
             },
             {
                 "role":"user",

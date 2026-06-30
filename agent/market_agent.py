@@ -1,10 +1,8 @@
 import time
 import finnhub
-from dotenv import load_dotenv
-import os
-load_dotenv()
+from settings import FINNHUB_API_KEY
 
-client=finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
+client=finnhub.Client(api_key=FINNHUB_API_KEY)
 
 # 本地缓存
 _cache = {}
@@ -57,3 +55,5 @@ def get_market_data(symbol):
         "price": 0,
         "change": 0
     }
+
+

@@ -1,67 +1,114 @@
+from openai import OpenAI
+from settings import (
+    DEEPSEEK_API_KEY,
+    DEEPSEEK_BASE_URL,
+    LLM_MODEL,
+    LLM_TEMPERATURE,
+)
+import json
+
+client = OpenAI(
+    api_key=DEEPSEEK_API_KEY,
+    base_url=DEEPSEEK_BASE_URL,
+)
+
+
 def make_decision(
-    technical,
-    market,
-    news
+    technical: dict,
+    market: dict,
+    news: dict,
 ):
+    best_sector = market.get("best_sector", market.get("symbol", "未知"))
+    market_score = market.get("score", int(round(market.get("change", 0) * 10 + 50)))
 
-    score = 0
+    prompt = f"""
+你是一名专业量化投资策略分析师。
 
-    reasons = []
+请根据以下信息判断当前是否适合买入。
 
-    # =====================
-    # 技术面
-    # =====================
+=========================
+【技术分析】
 
-    if technical["trend"] == "UP":
+趋势：
+{technical.get("trend", "未知")}
 
-        score += 30
+均线信号：
+{technical.get("ma_signal", "未知")}
 
-        reasons.append("均线多头趋势")
+RSI：
+{technical.get("RSI", 50)}
 
-    if technical["rsi_signal"] == "NORMAL":
+RSI状态：
+{technical.get("rsi_signal", "未知")}
 
-        score += 20
+=========================
+【市场分析】
 
-        reasons.append("RSI健康")
+最强板块/标的：
+{best_sector}
 
-    if technical["ma_signal"] == "BUY":
+市场评分：
+{market_score}
 
-        score += 20
+=========================
+【新闻分析】
 
-        reasons.append("均线金叉")
+新闻摘要：
+{news["summary"]}
 
-    # =====================
-    # 板块
-    # =====================
+新闻情绪：
+{news["sentiment"]}
 
-    market_score = market.get("score", 0)
-    if market_score >= 80:
-        score += 20
-        reasons.append("热门板块")
+新闻评分：
+{news["score"]}
 
-    # =====================
-    # 新闻
-    # =====================
+=========================
 
-    sentiment = news.get("sentiment", "").lower()
-    if sentiment in ["利好", "bullish"]:
-        score += 10
-        reasons.append("新闻利好")
+请仅返回JSON：
 
-    # =====================
-    # 最终决策
-    # =====================
+{{
+    "signal":"BUY/HOLD/SELL",
+    "confidence":90,
+    "score":88,
+    "reasons":[
+        "...",
+        "...",
+        "..."
+    ]
+}}
 
-    if score >= 70:
-        signal = "BUY"
-    elif score >= 45:
-        signal = "HOLD"
-    else:
-        signal = "SELL"
+要求：
 
-    return {
-        "signal": signal,
-        "score": score,
-        "confidence": int(min(max(score, 0), 100)),
-        "reasons": reasons
-    }
+1 signal只能是 BUY HOLD SELL
+
+2 confidence 为0~100
+
+3 score 为0~100
+
+4 reasons 三条以内
+
+5 不要输出Markdown
+
+6 不要输出解释
+
+7 只返回JSON
+"""
+        
+    response = client.chat.completions.create(
+    model=LLM_MODEL,
+    messages=[
+        {
+            "role": "system",
+            "content": "你是一名专业量化投资策略分析师，只返回JSON。"
+        },
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ],
+    temperature=0.2
+)   
+
+    return json.loads(
+        response.choices[0].message.content
+    )

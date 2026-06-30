@@ -5,11 +5,8 @@ from agent.market_agent import get_market_data
 from agent.news_agent import get_news
 from agent.news_summary_agent import summarize_news
 from agent.strategy_agent import make_decision
-
 from backtest.engine import run_backtest
-
 from agent.advisor_agent import generate_advice
-
 def run_pipeline(
     symbol,
     money,
@@ -38,8 +35,8 @@ def run_pipeline(
         market,
         decision,
         money,
-        risk
-
+        risk,
+        news=news_result,
     )
 
     return {
