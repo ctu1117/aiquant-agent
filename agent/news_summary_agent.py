@@ -1,5 +1,6 @@
 from openai import OpenAI
 from settings import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, LLM_TEMPERATURE, LLM_MODEL
+import json
 
 client = OpenAI(
     api_key=DEEPSEEK_API_KEY,
@@ -18,7 +19,6 @@ def summarize_news(news):
 
     for item in news[:10]:
         news_text += f"""
-
 标题:
 {item['title']}
 
@@ -27,36 +27,40 @@ def summarize_news(news):
 
 来源:
 {item['source']}
+
 """
 
     prompt = f"""
-
 你是一名华尔街资深科技行业分析师。
 
 以下是最近的财经新闻：
 
-   {news_text}
+{news_text}
 
-请按照以下格式输出：
+请仅返回 JSON，不要输出任何解释，不要使用 Markdown，不要使用 ```json。
 
-【新闻总结】
-用100字以内总结新闻核心内容。
+格式如下：
 
-【市场情绪】
-只能选择：
-利好
-中性
-利空
+{{
+    "summary":"100字以内总结",
+    "sentiment":"bullish 或 neutral 或 bearish",
+    "score":8,
+    "advice":"一句投资启示"
+}}
 
-【情绪评分】
-1~10分
+要求：
 
-【投资启示】
-一句话说明对投资者意味着什么。
+1.summary不超过100字
+2.sentiment只能是：
+- bullish
+- neutral
+- bearish
+3.score只能是1~10整数
+4.返回合法JSON
 """
 
     response = client.chat.completions.create(
-        model="deepseek-chat",
+        model=LLM_MODEL,
         messages=[
             {
                 "role": "system",
@@ -64,10 +68,10 @@ def summarize_news(news):
             },
             {
                 "role": "user",
-                 "content": prompt
+                "content": prompt
             }
         ],
         temperature=0.2
     )
 
-    return response.choices[0].message.content
+    return json.loads(response.choices[0].message.content)

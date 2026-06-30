@@ -1,31 +1,51 @@
 from config.fund_mapping import FUND_MAPPING
+
 def generate_advice(
-    ranking,
-    money,
-    risk
+    market: dict,
+    decision: dict,
+    money: float,
+    risk: str
 ):
-    best_sector = ranking[0]["sector"]
-    best_change = ranking[0]["avg_change"]
-    funds=FUND_MAPPING.get(
-       best_sector,
-       []
+
+    best_sector = market.get("best_sector", market.get("symbol", "未知"))
+    score = market.get("score", int(round(market.get("change", 0) * 10 + 50)))
+
+    signal = decision.get("signal", "HOLD")
+    confidence = decision.get("confidence", int(round(decision.get("score", 0))))
+    reasons = decision.get("reasons", [])
+
+    funds = FUND_MAPPING.get(best_sector, [])
+
+    # ======================
+    # 风险配置
+    # ======================
+
+    allocation = {
+
+        "low": (0.5, 0.5, "5%-8%"),
+
+        "medium": (0.7, 0.3, "8%-15%"),
+
+        "high": (0.9, 0.1, "15%-25%")
+
+    }
+
+    invest_ratio, cash_ratio, expected = allocation.get(
+        risk,
+        allocation["medium"]
     )
 
-    if risk=="low":
-       sector_money = money * 0.7
-       cash_money = money * 0.3
-       expected="5%-8%"
-    elif risk=="medium":
-       sector_money = money * 0.7
-       cash_money = money * 0.3
-       expected="8%-15%"
-    else:
-       sector_money = money * 0.7
-       cash_money = money * 0.3
-       expected="15%-25%"
+    invest_money = money * invest_ratio
+    cash_money = money * cash_ratio
 
-    if best_sector == "AI算力":
-        return f"""
+    # ======================
+    # 生成建议
+    # ======================
+
+    report = f"""
+=============================
+AI 投资建议
+=============================
 
 风险等级：
 {risk}
@@ -33,60 +53,32 @@ def generate_advice(
 当前最强板块：
 {best_sector}
 
-总资金：
-{money}元
+板块评分：
+{score}/100
 
-建议投入：
-{sector_money:.0f}元
+AI决策：
+{signal}
 
-保留现金：
-{cash_money:.0f}元
+决策置信度：
+{confidence}%
 
-推荐基金:
-{funds}
+投资金额：
+{invest_money:.0f} 元
 
-预期收益：
-{expected}
-"""
-
-    elif best_sector == "半导体":
-        return f"""
-
-风险等级：
-{risk}
-
-当前最强板块：
-{best_sector}
-
-总资金：
-{money}元
-
-建议投入：
-{sector_money:.0f}元
-
-保留现金：
-{cash_money:.0f}元
+现金保留：
+{cash_money:.0f} 元
 
 推荐基金：
-{funds}
+{", ".join(funds) if funds else "暂无"}
 
-预期收益：
+预计收益：
 {expected}
+
+推荐理由：
 """
 
-    else:
+    for idx, reason in enumerate(reasons, 1):
 
-     return f"""
-风险等级：{risk}
-当前最强板块：{best_sector}
-平均涨幅：{best_change}%
+        report += f"\n{idx}. {reason}"
 
-市场暂无明显主线。
-
-建议：
-
-50% ETF
-50% 现金
-
-等待新的机会。
-"""
+    return report

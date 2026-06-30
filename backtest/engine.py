@@ -1,7 +1,7 @@
-from strategy.ma_strategy import generate_signal
+from strategy.ma_strategy import generate_signals
 
 
-def run_backtest(df, initial_cash=10000):
+def run_backtest(df, initial_cash):
 
     cash = initial_cash
     shares = 0
@@ -25,7 +25,7 @@ def run_backtest(df, initial_cash=10000):
 
         rsi = df["RSI"].iloc[i]
 
-        signal = generate_signal(
+        signal = generate_signals(
             prev_ma20,
             prev_ma60,
             curr_ma20,
