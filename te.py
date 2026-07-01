@@ -1,7 +1,7 @@
-from data.data_agent import load_data
+from agent.data_agent import load_data
 from backtest.vectorbt import run_vectorbt
 from strategy.ma_strategy import generate_signals
-from data.data_agent import load_data
+from agent.data_agent import load_data
 df=load_data()
 entries, exits = generate_signals(df)
 

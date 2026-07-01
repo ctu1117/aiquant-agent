@@ -1,9 +1,9 @@
 import vectorbt as vbt
-
+from config.user_profile import USER_PROFILE
 from strategy.ma_strategy import generate_signals
 
-
-def run_vectorbt(df):
+money = USER_PROFILE["money"]
+def run_vectorbt(df,money):
 
     entries, exits = generate_signals(df)
 
@@ -15,7 +15,7 @@ def run_vectorbt(df):
 
         exits=exits,
 
-        init_cash=10000,
+        init_cash=money,
 
         fees=0.001,
 

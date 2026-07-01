@@ -1,4 +1,4 @@
-from analyze.analyze_data import SECTORS
+from data.analyze_data import SECTORS
 from pipeline.pipeline import run_pipeline
 from config.user_profile import USER_PROFILE
 
